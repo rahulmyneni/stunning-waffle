@@ -63,8 +63,12 @@ def generate_questions(llm, resume_text, question_type, difficulty, num_question
     2. How would you...? - [Skill: ...]
     ...
     """
-    if external_context:
-        full_prompt += f"Additional Context from CSV:{external_context}"
+        if external_context:
+        full_prompt += f"
+
+Additional Context from CSV:
+{external_context}
+"
     return llm.invoke(full_prompt).strip()
 
 def generate_followup(llm, question, answer):
@@ -123,7 +127,8 @@ if github_csv_url:
     df_context = read_csv_from_github(github_csv_url)
     if not df_context.empty:
         # Combine all rows and columns to a text block
-        external_context = df_context.astype(str).apply(lambda row: ' | '.join(row), axis=1).str.cat(sep='')
+        external_context = df_context.astype(str).apply(lambda row: ' | '.join(row), axis=1).str.cat(sep='
+')
 
 st.set_page_config(page_title="AI Resume Interview Generator", layout="centered")
 st.title("🧠 Interactive Resume Interview Simulator")
@@ -136,7 +141,7 @@ num_questions = st.slider("🔢 Number of Questions", min_value=1, max_value=10,
 if uploaded_file:
     with st.spinner("🔍 Reading and analyzing resume..."):
         resume_text = extract_text_from_pdf(uploaded_file)
-        llm = OllamaLLM(model="hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF")
+        llm = OllamaLLM(model="llama3")
 
         # Step 1: Skill and role extraction
         extracted_info = extract_skills_roles(llm, resume_text)
